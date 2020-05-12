@@ -9,7 +9,7 @@
       </el-aside>
       <el-main class="animate_fix">
         <transition name="fade">
-          <router-view/>
+          <router-view :key="$route.path"/>
         </transition>
       </el-main>
     </el-container>
