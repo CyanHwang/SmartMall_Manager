@@ -3,10 +3,10 @@
     <el-breadcrumb separator="/">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item><a href="javascript:;">商城中心</a></el-breadcrumb-item>
-      <el-breadcrumb-item>新增商品</el-breadcrumb-item>
+      <el-breadcrumb-item>{{id?'编辑':'新增'}}商品</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <div class="hengxian"></div>
+    <div class="line"></div>
 
     <el-form :model="product" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
       <el-form-item label="所属分类" prop="categoryId">
@@ -52,7 +52,7 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+        <el-button type="primary" @click="submitForm('ruleForm')">{{id?'确认修改':'立即创建'}}</el-button>
         <el-button @click="resetForm('ruleForm')">重置</el-button>
       </el-form-item>
     </el-form>
@@ -62,12 +62,14 @@
 <script>
   import 'simplemde/dist/simplemde.min.css'
   import {markdownEditor} from 'vue-simplemde'
-
-  const uuidV1 = require('uuid/v1');
+  import uuidV1 from 'uuid/v1'
 
   export default {
     components: {
       markdownEditor
+    },
+    props:{
+      id:''
     },
     data() {
       return {
@@ -110,15 +112,15 @@
       };
     },
     created() {
-      this.init()
+      this.id&&this.init()
     },
     methods: {
       async init(){
         const res = await this.$http.get(`categories`)
         this.categories = res.data.categories;
       },
-      async submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
+      submitForm(formName) {
+        this.$refs[formName].validate(async (valid) => {
           if (valid) {
             await this.$http.post(`products`, this.product)
                 this.$notify({
@@ -207,7 +209,7 @@
     min-height: 300px;
   }
 
-  .hengxian {
+  .line {
     margin-top: 20px;
     border-top: 1px solid #eeeeee;
   }

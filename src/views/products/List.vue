@@ -1,23 +1,24 @@
 <template>
   <div>
     <el-breadcrumb separator="/">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item :to="'/'">首页</el-breadcrumb-item>
       <el-breadcrumb-item
         ><a href="javascript:;">商城中心</a></el-breadcrumb-item
       >
       <el-breadcrumb-item>商品管理</el-breadcrumb-item>
     </el-breadcrumb>
+    <div class="line"></div>
 
-    <div class="hengxian"></div>
-
-    <el-row class="sousuo">
+    <el-row>
       <el-col :span="8">
         <div class="controls">
-          <router-link to="/product/create">
-            <el-button type="success" size="small" class="create"
-              >新增商品</el-button
-            >
-          </router-link>
+          <el-button
+            type="success"
+            size="small"
+            class="create"
+            @click="$router.push('/products/create')"
+            >新增商品</el-button
+          >
           <el-button
             type="danger"
             size="small"
@@ -77,7 +78,6 @@
       ref="multipleTable"
       style="width: 100%"
       @selection-change="handleSelectionChange"
-      id="product"
     >
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="编号" prop="id" width="50"></el-table-column>
@@ -106,11 +106,12 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <router-link
-            :to="{ name: 'product_edit', params: { id: scope.row.id } }"
+          <el-button
+            size="mini"
+            type="primary"
+            @click="$router.push(`/products/${scope.row.id}`)"
+            >编辑</el-button
           >
-            <el-button size="mini" type="primary">编辑</el-button>
-          </router-link>
           <el-button
             size="mini"
             type="danger"
@@ -186,8 +187,8 @@ export default {
       this.page.pageSize = res.data.pagination.pageSize;
 
       //所有分类
-      const res = await this.$http.get(`categories`);
-      this.categories = res.data.categories;
+      const result = await this.$http.get(`categories`);
+      this.categories = result.data.categories;
     },
 
     //导出
@@ -237,11 +238,11 @@ export default {
         type: "warning",
       })
         .then(async () => {
-          await this.$http.delete(`products/${row.id}`)
+          await this.$http.delete(`products/${row.id}`);
           await this.$message({
-                type: "success",
-                message: "删除成功!",
-              });
+            type: "success",
+            message: "删除成功!",
+          });
           this.init();
         })
         .catch(() => {
@@ -267,18 +268,18 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       })
-        .then( async () => {
+        .then(async () => {
           const checked_id = this.multipleSelection.map((item) => {
             return item.id;
           });
           await this.$http.post(`products/delete_checked`, {
-              checked_id: checked_id,
-            })
-            this.$message({
-              type: "success",
-              message: "删除成功!",
-            });
-            this.init();
+            checked_id: checked_id,
+          });
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+          this.init();
         })
         .catch(() => {
           this.$message({
@@ -296,7 +297,7 @@ export default {
   margin: 13px 0;
 }
 
-.hengxian {
+.line {
   margin-top: 20px;
   border-top: 1px solid #eeeeee;
 }

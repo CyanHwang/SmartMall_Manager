@@ -1,18 +1,17 @@
 <template>
     <el-menu
-            default-active="/"
+            :default-active="$route.path"
             class="el-menu-vertical-demo"
-            :router="true"
+            router
             background-color="#545c64"
             text-color="#fff"
-            active-text-color="#ffd04b">
-
+            active-text-color="#ffd04b"
+            style="width:200px">
         <el-menu-item index="/">
             <span slot="title">
-                <i class="el-icon-s-home"></i>首&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;页
+                <i class="el-icon-s-home"></i>首页
             </span>
         </el-menu-item>
-
         <el-submenu index="1">
             <template slot="title">
                 <i class="el-icon-shopping-cart-full"></i>
