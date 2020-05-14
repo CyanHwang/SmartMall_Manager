@@ -7,8 +7,8 @@
       <el-aside width="200px">
         <Aside></Aside>
       </el-aside>
-      <el-main class="animate_fix">
-        <transition name="fade">
+      <el-main style="height:88vh;min-width:700px">
+        <transition name="fade-in">
           <router-view :key="$route.path" />
         </transition>
       </el-main>
@@ -27,15 +27,17 @@ export default {
     AdminHeader,
   },
   data() {
-    return {};
-  },
+    return {
+    };
+  }
 };
 </script>
 
 <style>
+
 .el-header {
   line-height: 60px;
-  padding: 0!important;
+  padding: 0 !important;
 }
 .el-main {
   background-color: #fff;
@@ -46,5 +48,4 @@ export default {
   text-align: center;
   background-color: rgb(84, 92, 100);
 }
-
 </style>

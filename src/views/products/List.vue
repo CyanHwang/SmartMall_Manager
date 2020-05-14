@@ -31,8 +31,8 @@
             type="primary"
             size="small"
             class="unfold"
-            @click="exportExcel()"
-            >导出商品</el-button
+            @click="exportExcel"
+            >导出商品为Excel</el-button
           >
         </div>
       </el-col>
@@ -41,7 +41,7 @@
         <el-form :inline="true" class="search">
           <el-form-item label="所有分类">
             <el-select
-              v-model="search.categoryId"
+              v-model="search.CategoryId"
               filterable
               placeholder="请选择"
               size="medium"
@@ -57,7 +57,7 @@
           </el-form-item>
 
           <el-form-item label="名称">
-            <el-input size="medium" v-model="keyword"></el-input>
+            <el-input size="medium" v-model="search.keyword"></el-input>
           </el-form-item>
 
           <el-form-item>
@@ -74,6 +74,7 @@
     </el-row>
 
     <el-table
+    id="productsToExcel"
       :data="products"
       ref="multipleTable"
       style="width: 100%"
@@ -87,11 +88,15 @@
           <img :src="scope.row.image" alt="" class="thumb" />
         </template>
       </el-table-column>
-      <el-table-column label="所属分类" prop="categoryId">
+      <el-table-column label="所属分类" prop="CategoryId">
         <template slot-scope="scope">
-          <el-button type="success" size="small" plain>{{
-            scope.row.Category.name
-          }}</el-button>
+          <el-button
+            type="success"
+            size="small"
+            @click="searchCategory(scope.row)"
+            plain
+            >{{ scope.row.Category.name }}</el-button
+          >
         </template>
       </el-table-column>
 
@@ -104,12 +109,12 @@
           scope.row.createdAt | edit_date
         }}</template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" min-width="160">
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="primary"
-            @click="$router.push(`/products/${scope.row.id}`)"
+            @click="$router.push(`/products/edit/${scope.row.id}`)"
             >编辑</el-button
           >
           <el-button
@@ -123,8 +128,8 @@
     </el-table>
 
     <!--分页-->
-    <div class="block el-pagination" style="margin-top: 50px;">
-      <span class="el-pagination__total" style="margin-left: 20px;"
+    <div class="block el-pagination" style="text-align:center;margin-top:10px">
+      <span class="el-pagination__total"
         >共 {{ page.total }} 条数据</span
       >
       <el-pagination
@@ -134,7 +139,7 @@
         :page-size="page.pageSize"
         @current-change="handleCurrentChange"
         :current-page.sync="page.currentPage"
-      ></el-pagination>
+      />
     </div>
   </div>
 </template>
@@ -149,7 +154,8 @@ export default {
       products: [],
       categories: [],
       search: {
-        categoryId: "",
+        CategoryId: "",
+        keyword: "",
       },
       page: {
         total: 0,
@@ -157,7 +163,6 @@ export default {
         currentPage: 1,
         num: 1,
       },
-      keyword: "",
       multipleSelection: [],
     };
   },
@@ -180,7 +185,7 @@ export default {
     //首页
     async init() {
       const res = await this.$http.get(
-        `products?currentPage=${this.page.num}&keyword=${this.keyword}&categoryId=${this.search.categoryId}`
+        `products?currentPage=${this.page.num}&keyword=${this.search.keyword}&CategoryId=${this.search.CategoryId}`
       );
       this.products = res.data.products;
       this.page.total = res.data.pagination.total;
@@ -188,7 +193,23 @@ export default {
 
       //所有分类
       const result = await this.$http.get(`categories`);
-      this.categories = result.data.categories;
+      this.categories = result.data;
+    },
+
+    searchCategory(row) {
+      this.$confirm("要搜索该分类吗？", "提示", {
+        confirmButtonText: "看看该分类吧",
+        cancelButtonText: "取消",
+        type: "info",
+        center: true,
+      }).then(async () => {
+        const res = await this.$http.get(
+          `products?CategoryId=${row.CategoryId}`
+        );
+        this.products = res.data.products;
+        this.page.total = res.data.pagination.total;
+        this.page.pageSize = res.data.pagination.pageSize;
+      });
     },
 
     //导出
@@ -201,9 +222,9 @@ export default {
       })
         .then(() => {
           /* generate workbook object from table */
-          var wb = XLSX.utils.table_to_book(document.querySelector("#product"));
+          let wb = XLSX.utils.table_to_book(document.querySelector("#productsToExcel"));
           /* get binary string as output */
-          var wbout = XLSX.write(wb, {
+          let wbout = XLSX.write(wb, {
             bookType: "xlsx",
             bookSST: true,
             type: "array",
@@ -218,7 +239,7 @@ export default {
           }
           this.$message({
             type: "success",
-            message: "恭喜，导出成功!",
+            message: "导出Excel成功！",
           });
           return wbout;
         })
@@ -303,8 +324,8 @@ export default {
 }
 
 .thumb {
-  width: 80px;
-  height: 40px;
+  width: 60px;
+  max-height: 80px;
 }
 
 .name_s {

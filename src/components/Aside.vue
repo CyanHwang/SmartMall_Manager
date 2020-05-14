@@ -3,6 +3,7 @@
             :default-active="$route.path"
             class="el-menu-vertical-demo"
             router
+            unique-opened
             background-color="#545c64"
             text-color="#fff"
             active-text-color="#ffd04b"

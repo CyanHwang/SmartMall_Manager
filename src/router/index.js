@@ -8,8 +8,8 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
-    { path: "/login", component: () => import("../views/Login.vue") },
-    { path: "/register", component: () => import("../views/Register.vue") },
+    { path: "/sign-in", component: () => import("../views/Login.vue") ,meta:{isPublic:true}},
+    { path: "/sign-up", component: () => import("../views/Register.vue"),meta:{isPublic:true} },
     {
       path: "/",
       component: Home,
@@ -36,10 +36,16 @@ const router = new VueRouter({
           component: () => import("../views/products/Edit.vue"),
           props: true,
         },
-        
       ],
     },
   ],
 });
+
+router.beforeEach((to,from,next)=>{
+  if(!to.meta.isPublic&&!localStorage.token){
+    return next('/sign-in')
+  }
+  next()
+})
 
 export default router;
